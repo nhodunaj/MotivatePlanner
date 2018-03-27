@@ -4,16 +4,89 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet id="1" author="bob">
-        <createTable tableName="department">
-            <column name="id" type="int">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="active" type="boolean" defaultValueBoolean="true"/>
-        </createTable>
+    <changeSet id="1-create-table-user" author="nhodunaj">
+        <sql>
+            CREATE TABLE user_account(
+                id serial PRIMARY KEY NOT NULL,
+                name varchar(31),
+                surname varchar(31),
+                email varchar(255) NOT NULL,
+                login varchar(31) NOT NULL,
+                phone varchar(15),
+                password varchar(255) NOT NULL
+            );
+        </sql>
     </changeSet>
+
+    <changeSet id="1-create-table-activity_type" author="nhodunaj">
+        <sql>
+            CREATE TABLE activity_type(
+                id serial PRIMARY KEY NOT NULL,
+                name varchar(255),
+                user_id int REFERENCES user_account(id) ON DELETE CASCADE ON UPDATE CASCADE DEFAULT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1-create-table-activity" author="nhodunaj">
+        <sql>
+            CREATE TABLE activity(
+            id serial PRIMARY KEY NOT NULL,
+            user_id int REFERENCES user_account(id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+            activity_type_id int REFERENCES activity_type(id) ON DELETE SET NULL DEFAULT NULL,
+            name varchar(255) NOT NULL DEFAULT '',
+            time varchar(15),
+            is_completed boolean NOT NULL DEFAULT false,
+            start time DEFAULT NULL,
+            finish time DEFAULT NULL,
+            date timestamp
+        );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1-create-table-cost_type" author="nhodunaj">
+        <sql>
+            CREATE TABLE cost_type(
+                id serial PRIMARY KEY NOT NULL,
+                name varchar(255) NOT NULL DEFAULT '',
+                user_id int REFERENCES user_account(id) ON DELETE CASCADE ON UPDATE CASCADE DEFAULT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1-create-table-cost" author="nhodunaj">
+        <sql>
+            CREATE TABLE cost(
+                id SERIAL PRIMARY KEY NOT NULL,
+                user_id int REFERENCES user_account(id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                cost_type_id int REFERENCES cost_type(id) ON DELETE SET NULL DEFAULT NULL,
+                name varchar(255) NOT NULL DEFAULT '',
+                value numeric(10,2),
+                date timestamp
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1-create-table-diary" author="nhodunaj">
+        <sql>
+            CREATE TABLE diary(
+                id SERIAL PRIMARY KEY NOT NULL,
+                user_id int REFERENCES user_account(id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                name varchar(255)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1-create-table-diary_record" author="nhodunaj">
+        <sql>
+            CREATE TABLE diary_record(
+                id SERIAL PRIMARY KEY NOT NULL,
+                diary_id int REFERENCES diary(id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                record_text text NOT NULL DEFAULT '',
+                date timestamp
+            );
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>
